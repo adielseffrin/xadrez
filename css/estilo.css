@@ -1,0 +1,35 @@
+#campo-jogo {
+	
+}
+
+td {
+	border: 1px solid black;
+	width: 50px;
+	height: 50px;
+}
+
+.hidden{
+	border: none;
+}
+
+.location{
+	border: none;
+	
+}
+
+.location.row{
+	vertical-align: bottom;
+	text-align: center;
+}
+
+.location.column{
+	text-align: right;
+}
+
+.black{
+	background-color: #401804;
+}
+
+.white{
+	background-color: #fffcf1;
+}

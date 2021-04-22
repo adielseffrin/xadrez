@@ -4,26 +4,46 @@
   <meta charset="UTF-8">
   <title>Tabuleiro</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
-  <link href='./css/estilo_0.css' rel='stylesheet' type='text/css'>
+  <link href='./css/estilo.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
   <section>
     <div class="board">
-      <table>
-		<tr>
-			<td></td><td>1</td><td>2</td><td>3</td><td>4</td>
+      <table id="campo-jogo">
+		<tr class="location">
+			<td class="hidden"></td>
+			<td class="location row">1</td>
+			<td class="location row">2</td>
+			<td class="location row">3</td>
+			<td class="location row">4</td>
 		</tr>
 		<tr>
-			<td>A</td><td></td><td></td><td></td><td></td>
+			<td class="location  column">A</td>
+			<td class="black"></td>
+			<td class="white"></td>
+			<td class="black"></td>
+			<td class="white"></td>
 		</tr>
 		<tr>
-			<td>B</td><td></td><td></td><td></td><td></td>
+			<td class="location column">B</td>
+			<td class="white"></td>
+			<td class="black"></td>
+			<td class="white"></td>
+			<td class="black"></td>
 		</tr>
 		<tr>
-			<td>C</td><td></td><td></td><td></td><td></td>
+			<td class="location column">C</td>
+			<td class="black"></td>
+			<td class="white"></td>
+			<td class="black"></td>
+			<td class="white"></td>
 		</tr>
 		<tr>
-			<td>D</td><td></td><td></td><td></td><td></td>
+			<td class="location column">D</td>
+			<td class="white"></td>
+			<td class="black"></td>
+			<td class="white"></td>
+			<td class="black"></td>
 		</tr>
 	  </table>
     </div>
