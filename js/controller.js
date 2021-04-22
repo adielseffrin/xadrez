@@ -4,6 +4,10 @@ class Peca{
         this.cor = cor;
         this.location = location;
         this.img = img;
+        this.updatePositionCoord();
+    }
+
+    updatePositionCoord(){
         this.row = [...this.location][0].charCodeAt(0);
         this.col = [...this.location][1];
     }
@@ -16,6 +20,7 @@ class Peca{
         document.getElementById(this.location).removeChild(this.img);
         this.location = toLocation;
         this.render();
+        this.updatePositionCoord();
     }
 
     possibleLocation(){
@@ -31,6 +36,7 @@ class Peca{
                 possibilities.push(newRow+""+this.col);
             break;
         }
+        console.log(possibilities)
         return possibilities;
     }
 }
