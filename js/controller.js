@@ -64,6 +64,7 @@ class Peca{
 }
 
 var pecas = [];
+var pecaAtiva = null;
 
 document.onreadystatechange = () => {
     if (document.readyState === 'complete') {
@@ -133,7 +134,9 @@ function clearMovement(){
 function activateClickableMovement(peca){
     clearMovement();
     if(!peca.active){
+        if(!!pecaAtiva) pecaAtiva.desactivate();
         peca.activate();
+        pecaAtiva = peca;
         let location = peca.possibleLocation();
         location.forEach(l => {
             if(!checkColision(l)){
