@@ -30,8 +30,16 @@ td {
 	background-color: #fffcf1;
 }
 
-.active {
+.available {
     background-color: #143b05;
+}
+
+.active{
+	background-color: aqua;
+}
+
+.unavailable{
+	background-color: #df0000;
 }
 
 .peca{
