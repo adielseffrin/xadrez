@@ -1,69 +1,8 @@
-class Peca{
-    constructor(nome, cor, location, img){
-        this.nome = nome;
-        this.cor = cor;
-        this.location = location;
-        this.img = img;
-        this.updatePositionCoord();
-        this.active = false;
-        this.firstMove = true; //valido para peao, rei e torre
-    }
-
-    updatePositionCoord(){
-        this.row = [...this.location][0].charCodeAt(0);
-        this.col = [...this.location][1];
-    }
-
-    render(){
-        document.getElementById(this.location).appendChild(this.img);
-    }
-
-    move(toLocation){
-        document.getElementById(this.location).removeChild(this.img);
-        this.location = toLocation;
-        this.render();
-        this.updatePositionCoord();
-        if(this.firstMove) this.firstMove = false;
-    }
-
-    possibleLocation(){
-        let possibilities = [];
-        let newRow;
-        switch(this.nome){
-            case "peao":
-                if(this.cor == "branco"){
-                    newRow = String.fromCharCode(parseInt(this.row)-1 >= 97 ? parseInt(this.row)-1 :parseInt(this.row));
-                    possibilities.push(newRow+""+this.col);
-                    if(this.firstMove){
-                        newRow = String.fromCharCode(parseInt(this.row)-2 >= 97 ? parseInt(this.row)-2 :parseInt(this.row));
-                        possibilities.push(newRow+""+this.col);
-                    }
-                }else{
-                    newRow = String.fromCharCode(parseInt(this.row)+1 <= 104 ? parseInt(this.row)+1 :parseInt(this.row));
-                    possibilities.push(newRow+""+this.col);
-                    if(this.firstMove){
-                        newRow = String.fromCharCode(parseInt(this.row)+2 <= 104 ? parseInt(this.row)+2 :parseInt(this.row));
-                        possibilities.push(newRow+""+this.col);
-                    }
-                }
-            break;
-        }
-        return possibilities;
-    }
-
-    activate(){
-        this.active = true; 
-        document.querySelector('#'+this.location).classList.add('active');
-        
-    }
-
-    desactivate(){
-        this.active = false; 
-        document.querySelector('#'+this.location).classList.remove('active');
-    }
-}
+import Peca from './Peca.js';
+import Peao from './Peao.js';
 
 var pecas = [];
+var activePiece;
 
 document.onreadystatechange = () => {
     if (document.readyState === 'complete') {
@@ -113,13 +52,23 @@ function placeStartingPieces(){
 
 function createPiece(location, name, cor){
     let img = document.createElement('img');
-    let peca = new Peca(name,cor, location, img);
+    let peca;
+    switch(name){
+        case "peao":
+            peca = new Peao(name,cor, location, img);
+            break;
+        default:
+            peca = new Peca(name,cor, location, img);
+    }
     peca.img.src = `./images/${name}-${cor}.png`;
     peca.img.className = 'peca';
     peca.img.addEventListener("click",() => {activateClickableMovement(peca)});
     return peca;
 }
-
+/*
+This function is not intended to clear pieces properties,
+only style and html properties.
+*/
 function clearMovement(){
     let elAct = document.querySelectorAll(['.available ','.unavailable']);
     elAct.forEach(function(e){
@@ -134,23 +83,36 @@ function activateClickableMovement(peca){
     clearMovement();
     if(!peca.active){
         peca.activate();
+        if(activePiece !== undefined) activePiece.desactivate();
+        activePiece = peca;
         let location = peca.possibleLocation();
         location.forEach(l => {
             if(!checkColision(l)){
-                document.querySelector('#'+l).classList.add('available');
-                document.querySelector('#'+l).setAttribute('origem',peca.location);
-                document.querySelector('#'+l).addEventListener("click", move);
+                document.querySelector('#'+l.destination).classList.add('available');
+                document.querySelector('#'+l.destination).setAttribute('origem',peca.location);
+                document.querySelector('#'+l.destination).addEventListener("click", move);
             }else{
-                document.querySelector('#'+l).classList.add('unavailable'); 
+                document.querySelector('#'+l.destination).classList.add('unavailable'); 
             }
         })
     }else{
         peca.desactivate();
+        activePiece = undefined;
     }
 }
 
+/*
+Check if the final destination is free
+and if it's a piece that doesn't jump
+other pieces, validade if the path to 
+that destination is free.
+*/
 function checkColision(location){
-   return pecas.findIndex(e => e.location == location) >= 0;
+    let pathOk = true;
+    location.path.forEach(function(e){
+        pathOk = pathOk && (pecas.findIndex(p => p.location == e) < 0); 
+    })
+    return (pecas.findIndex(e => e.location == location.destination) >= 0) || !pathOk;
 }
 
 function move(){
@@ -158,6 +120,7 @@ function move(){
     let destino = this.id;
     let peca = pecas[pecas.findIndex(e => e.location == origem)]
     peca.desactivate();
+    activePiece = undefined;
     peca.move(destino);
     clearMovement();
 }
