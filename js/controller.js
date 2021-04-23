@@ -5,6 +5,8 @@ class Peca{
         this.location = location;
         this.img = img;
         this.updatePositionCoord();
+        this.active = false;
+        this.firstMove = true; //valido para peao, rei e torre
     }
 
     updatePositionCoord(){
@@ -21,6 +23,7 @@ class Peca{
         this.location = toLocation;
         this.render();
         this.updatePositionCoord();
+        if(this.firstMove) this.firstMove = false;
     }
 
     possibleLocation(){
@@ -30,14 +33,33 @@ class Peca{
             case "peao":
                 if(this.cor == "branco"){
                     newRow = String.fromCharCode(parseInt(this.row)-1 >= 97 ? parseInt(this.row)-1 :parseInt(this.row));
+                    possibilities.push(newRow+""+this.col);
+                    if(this.firstMove){
+                        newRow = String.fromCharCode(parseInt(this.row)-2 >= 97 ? parseInt(this.row)-2 :parseInt(this.row));
+                        possibilities.push(newRow+""+this.col);
+                    }
                 }else{
                     newRow = String.fromCharCode(parseInt(this.row)+1 <= 104 ? parseInt(this.row)+1 :parseInt(this.row));
+                    possibilities.push(newRow+""+this.col);
+                    if(this.firstMove){
+                        newRow = String.fromCharCode(parseInt(this.row)+2 <= 104 ? parseInt(this.row)+2 :parseInt(this.row));
+                        possibilities.push(newRow+""+this.col);
+                    }
                 }
-                possibilities.push(newRow+""+this.col);
             break;
         }
-        console.log(possibilities)
         return possibilities;
+    }
+
+    activate(){
+        this.active = true; 
+        document.querySelector('#'+this.location).classList.add('active');
+        
+    }
+
+    desactivate(){
+        this.active = false; 
+        document.querySelector('#'+this.location).classList.remove('active');
     }
 }
 
@@ -84,6 +106,9 @@ function placeStartingPieces(){
     pecas.push(createPiece("g6","peao","branco"));
     pecas.push(createPiece("g7","peao","branco"));
     pecas.push(createPiece("g8","peao","branco"));
+
+    pecas.push(createPiece("e5","peao","preto"));
+
 }
 
 function createPiece(location, name, cor){
@@ -95,29 +120,45 @@ function createPiece(location, name, cor){
     return peca;
 }
 
-function activateClickableMovement(peca){
-    let location = peca.possibleLocation();
-    let elAct = document.querySelectorAll('.active');
+function clearMovement(){
+    let elAct = document.querySelectorAll(['.available ','.unavailable']);
     elAct.forEach(function(e){
-        e.classList.remove('active'); 
+        e.classList.remove('available'); 
+        e.classList.remove('unavailable');
         e.removeEventListener("click", move);
         e.removeAttribute('origem');
     });
-    location.forEach(l => {
-        document.querySelector('#'+l).classList.add('active');
-        document.querySelector('#'+l).setAttribute('origem',peca.location);
-        document.querySelector('#'+l).addEventListener("click", move);
-    })
+}
+
+function activateClickableMovement(peca){
+    clearMovement();
+    if(!peca.active){
+        peca.activate();
+        let location = peca.possibleLocation();
+        location.forEach(l => {
+            if(!checkColision(l)){
+                document.querySelector('#'+l).classList.add('available');
+                document.querySelector('#'+l).setAttribute('origem',peca.location);
+                document.querySelector('#'+l).addEventListener("click", move);
+            }else{
+                document.querySelector('#'+l).classList.add('unavailable'); 
+            }
+        })
+    }else{
+        peca.desactivate();
+    }
+}
+
+function checkColision(location){
+   return pecas.findIndex(e => e.location == location) >= 0;
 }
 
 function move(){
     let origem = this.getAttribute('origem');
     let destino = this.id;
     let peca = pecas[pecas.findIndex(e => e.location == origem)]
+    peca.desactivate();
     peca.move(destino);
-    let el = document.getElementById(destino);
-    el.classList.remove('active');
-    el.removeEventListener("click", move);
-    el.removeAttribute('origem');
+    clearMovement();
 }
 
